@@ -3,7 +3,8 @@
 Use Python 3.13 in the supplied Udacity Workspace. The ten direct dependencies
 were installed and smoke-tested in a clean virtual environment on the existing
 Workspace's Linux x86_64 runtime with Python 3.13.15. The earlier clean local
-Linux x86_64 validation on CPython 3.12.3 also remains applicable to these pins.
+Linux x86_64 validation on CPython 3.12.3 used pytest 8.4.2 and requests 2.32.5;
+the current pytest 9.1.1 and requests 2.33.0 pins have not been rerun on 3.12.
 `setup.py` declares Python 3.12 as the minimum; that declaration does not certify
 every newer interpreter. Other Python versions and platforms have not been
 validated here. No change to the learner implementation is required by this
@@ -21,8 +22,8 @@ python -m pip check
 
 For local Python 3.12, use `python3.12` to create the environment instead.
 
-`requirements.txt` pins direct dependencies, preserving the previous compatible
-versions and adding flake8. It is not a complete transitive lockfile; record
+`requirements.txt` pins direct dependencies, including security updates to
+pytest and requests. It is not a complete transitive lockfile; record
 `python --version` and `python -m pip freeze` with validation evidence. Install
 requirements before the editable package: `setup.py` supplies local package
 metadata, not a second dependency list.
@@ -38,8 +39,8 @@ metadata, not a second dependency list.
 | pydantic | 2.11.9 | Typed request bodies, aliases, and examples. |
 | uvicorn | 0.36.0 | Local HTTP server for the completed API. |
 | httpx | 0.28.1 | HTTP client required by FastAPI/Starlette TestClient. |
-| requests | 2.32.5 | Separate real HTTP requests to the running server. |
-| pytest | 8.4.2 | Learner ML and API tests. |
+| requests | 2.33.0 | Separate real HTTP requests to the running server. |
+| pytest | 9.1.1 | Learner ML and API tests. |
 | flake8 | 7.3.0 | Local Python lint validation. |
 
 ## Removed dependencies
@@ -59,20 +60,28 @@ external runtime service was added.
 
 ## Verification boundary
 
-The existing Udacity Workspace passed installation of all ten pins in a new
-isolated virtual environment, editable package installation, `pip check`, and
-imports of the supplied preprocessing and metrics. Three temporary dependency
-probes passed: pandas/NumPy/scikit-learn interoperability on synthetic data,
-FastAPI/Pydantic request validation and OpenAPI access through httpx TestClient,
-and a real loopback requests call to a scratch Uvicorn server. Flake8 passed on
-the temporary probe file. The probes reported one unsuppressed warning about
+The current pins passed installation in a new isolated virtual environment in
+the existing Udacity Workspace on Linux x86_64 with CPython 3.13.15, editable
+package installation, and `pip check`. Six temporary pytest tests passed,
+covering pandas/NumPy/scikit-learn interoperability on synthetic data,
+FastAPI/Pydantic aliases, valid and rejected requests and OpenAPI access through
+httpx TestClient, a real loopback requests call to a scratch Uvicorn server,
+and pytest temporary paths, fixtures and parametrization. Flake8 passed on the
+temporary probe files. The probes reported one unsuppressed warning about
 Starlette TestClient's use of the deprecated `anyio.abc.BlockingPortal` alias.
+These tests also verified that `scripts/validate.py` succeeds for passing
+checks and returns nonzero for failing or empty tests; a direct pytest assertion
+failure returned exit status 1. These runs used the runtime source from
+`c142ae2c56dc6b2667d61afaa2bb38612047bd1f` with only the two dependency pins
+substituted; the integration changes no runtime source.
 
-The earlier local Python 3.12.3 validation passed dependency and editable
-installation, `pip check`, imports, scratch preprocessing/classifier/
+The earlier local Python 3.12.3 validation, with pytest 8.4.2 and requests 2.32.5,
+passed dependency and editable installation, `pip check`, imports, scratch
+preprocessing/classifier/
 serialization/metrics checks, FastAPI/Pydantic alias and OpenAPI checks through
 TestClient, and a real requests call to a scratch Uvicorn server. Scratch pytest
-and flake8 commands also passed in that environment.
+and flake8 commands also passed in that environment. This is historical evidence;
+the two upgraded pins have not been validated on Python 3.12.
 
 These probes check dependency interoperability, not the learner's solution, and
 are not committed project regression tests. The starter training and inference

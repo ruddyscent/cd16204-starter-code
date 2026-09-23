@@ -13,9 +13,9 @@ requires network access; Udacity access and submission are still necessary.
 
 ## 1. Set up Python
 
-Use Python 3.13 in the supplied Workspace (validated with 3.13.15). Python
-3.12.3 is also validated for local Linux use. Create and activate a virtual
-environment:
+Use Python 3.13 in the supplied Workspace (validated with 3.13.15). Earlier
+pins were validated with Python 3.12.3 locally; the current pytest and requests
+upgrades have not been rerun on 3.12. Create and activate a virtual environment:
 
 ```sh
 python3.13 -m venv .venv
@@ -29,8 +29,8 @@ For local Python 3.12, substitute `python3.12` in both virtual-environment
 creation commands in this guide. See [dependency notes](PYTHON_3_13_UPDATES.md)
 for versions and verification limits. The requirements passed dependency smoke
 checks in a clean virtual environment in the existing Linux Workspace with
-Python 3.13.15 and previously on local Linux with Python 3.12.3. Fresh Workspace
-image provisioning (issue #11) and completed-project end-to-end validation
+Python 3.13.15. Fresh Workspace image provisioning (issue #11) and
+completed-project end-to-end validation
 (issue #16) remain separate checks.
 
 ## 2. Inspect and clean the supplied data

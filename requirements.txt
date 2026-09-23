@@ -1,6 +1,6 @@
-# Validated with Python 3.13.15 in Workspace and 3.12.3 locally on Linux.
+# Validated with Python 3.13.15 in Workspace on Linux.
 # See PYTHON_3_13_UPDATES.md for verification scope.
-# Preserve existing compatible pins; transitive dependencies are resolved by pip.
+# Direct dependencies are pinned; transitive dependencies are resolved by pip.
 
 # API framework, validation, and HTTP server
 fastapi==0.117.1
@@ -14,6 +14,6 @@ scikit-learn==1.7.2
 
 # API tests, real HTTP requests, and local validation
 httpx==0.28.1
-requests==2.32.5
+requests==2.33.0
 pytest==9.1.1
 flake8==7.3.0
