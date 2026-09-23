@@ -110,6 +110,8 @@ dmypy.json
 
 # Machine Learning / Data Science specific
 # Models
+# Generated models stay ignored by default. Add only the final model and
+# fitted preprocessing artifacts required for inference (see README # Model).
 *.pkl
 *.joblib
 *.h5
