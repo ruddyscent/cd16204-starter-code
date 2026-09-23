@@ -1,16 +1,22 @@
 Working in a command line environment is recommended for ease of use with git and dvc. If on Windows, WSL1 or 2 is recommended.
 
+The repository root is the project root. Run installation, tests, DVC, and deployment commands from here. `requirements.txt`, `setup.py`, `main.py`, `sanitycheck.py`, and `data/census.csv` are at the root. `starter/` contains the Python package; for example, import `process_data` with `from starter.ml.data import process_data`.
+
+The training script and API are exercises to complete. Once implemented, run the training script with `python -m starter.train_model` and serve the API from the root with `uvicorn main:app`. Run the rubric helper from the root with `python sanitycheck.py tests` after writing API tests.
+
 # Environment Set up
 * **Option 1: Using pip and venv (Recommended)**
     * Ensure you have Python 3.13 installed
     * Create virtual environment: `python3.13 -m venv .venv`
     * Activate environment: `source .venv/bin/activate` (On Windows: `.venv\Scripts\activate`)
-    * Install dependencies: `pip install -r starter/requirements.txt`
+    * From the repository root, install dependencies: `pip install -r requirements.txt`
+    * Install the local package: `pip install -e .`
 
 * **Option 2: Using conda**
     * Download and install conda if you don't have it already.
     * conda create -n [envname] "python=3.13" scikit-learn pandas numpy pytest jupyter jupyterlab fastapi uvicorn pydantic httpx matplotlib seaborn -c conda-forge
     * Install git either through conda ("conda install git") or through your CLI, e.g. sudo apt-get git.
+    * From the repository root, install the local package: `pip install -e .`
 
 ## Repositories
 * Create a directory for the project and initialize git.
@@ -21,12 +27,14 @@ Working in a command line environment is recommended for ease of use with git an
     * Note: Add flake8 to requirements.txt if you want to use it for linting: `pip install flake8`
 
 # Data
-* Download census.csv and commit it to dvc.
+* Use `data/census.csv` and commit it to dvc.
 * This data is messy, try to open it in pandas and see what you get.
 * To clean it, use your favorite text editor to remove all spaces.
 
 # Model
 * Using the starter code, write a machine learning model that trains on the clean data and saves the model. Complete any function that has been started.
+* Include the final trained model and all fitted preprocessing artifacts needed for inference (such as the encoder and label binarizer) in the submitted repository/files, whether saved as `.pkl`, `.joblib`, or another format. Verify that a fresh clone or extracted submission can load them and run inference without retraining.
+* If a required artifact is ignored, add only that file with `git add -f path/to/artifact.pkl` (using its actual path). Review the staged files before committing and pushing.
 * Write unit tests for at least 3 functions in the model code.
 * Write a function that outputs the performance of the model on slices of the data.
     * Suggestion: for simplicity, the function can just output the performance on slices of just the categorical features.
@@ -44,6 +52,7 @@ Working in a command line environment is recommended for ease of use with git an
 # API Deployment
 * Create a free Heroku account (for the next steps you can either use the web GUI or download the Heroku CLI).
 * Create a new app and have it deployed from your GitHub repository.
+    * Use the repository root as the deployment root; it contains `requirements.txt` and `main.py`.
     * Enable automatic deployments that only deploy if your continuous integration passes.
     * Hint: think about how paths will differ in your local environment vs. on Heroku.
     * Hint: development in Python is fast! But how fast you can iterate slows down if you rely on your CI/CD to fail before fixing an issue. I like to run flake8 locally before I commit changes.

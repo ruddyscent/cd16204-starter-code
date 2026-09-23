@@ -110,6 +110,8 @@ dmypy.json
 
 # Machine Learning / Data Science specific
 # Models
+# Generated models stay ignored by default. Add only the final model and
+# fitted preprocessing artifacts required for inference (see README # Model).
 *.pkl
 *.joblib
 *.h5
@@ -119,7 +121,8 @@ dmypy.json
 
 # Data files (but keep small sample data)
 *.csv
-!starter/data/census.csv  # Keep the census dataset
+# Keep the sample census dataset.
+!data/census.csv
 
 # Large data directories
 data/large/

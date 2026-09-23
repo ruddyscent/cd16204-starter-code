@@ -11,7 +11,7 @@ This document summarizes the changes made to make the codebase compatible with P
 - Other dependencies updated to latest stable versions
 
 ## Code Changes
-1. **ML Data Processing (`ml/data.py`)**
+1. **ML Data Processing (`starter/ml/data.py`)**
    - Updated OneHotEncoder parameters from `sparse=False` to `sparse_output=False` to match newer scikit-learn API
 
 ## Notes
