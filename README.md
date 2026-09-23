@@ -35,6 +35,12 @@ completed-project end-to-end validation
 
 ## 2. Inspect and clean the supplied data
 
+The supplied CSV contains the training data from Becker, B. and Kohavi, R.
+(1996), [Adult, UCI Machine Learning Repository](https://doi.org/10.24432/C5XW20),
+licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+The project adds a header, including the names `fnlgt` and `salary`; the data
+rows are unchanged from UCI's `adult.data`.
+
 Load `data/census.csv` with pandas. Remove surrounding whitespace from column
 names and string values, and decide how to handle missing-value markers such as
 `?`. Preserve meaningful internal characters, original column names (including
