@@ -1,4 +1,5 @@
-# Validated with Python 3.12 on Linux; see PYTHON_3_13_UPDATES.md.
+# Validated with Python 3.13.15 in Workspace and 3.12.3 locally on Linux.
+# See PYTHON_3_13_UPDATES.md for verification scope.
 # Preserve existing compatible pins; transitive dependencies are resolved by pip.
 
 # API framework, validation, and HTTP server
