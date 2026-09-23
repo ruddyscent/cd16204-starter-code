@@ -1,60 +1,194 @@
-Working in a command line environment is recommended for ease of use with git and dvc. If on Windows, WSL1 or 2 is recommended.
+# Serving and Testing an ML Model with FastAPI
 
-The repository root is the project root. Run installation, tests, DVC, and deployment commands from here. `requirements.txt`, `setup.py`, `main.py`, `sanitycheck.py`, and `data/census.csv` are at the root. `starter/` contains the Python package; for example, import `process_data` with `from starter.ml.data import process_data`.
+Complete this project in the supplied Udacity Workspace using local files and
+commands. Build a Census income classifier, evaluate it, and serve predictions
+through FastAPI. The training, inference, API, tests, and HTTP client are learner
+exercises; this starter does not provide a completed solution.
 
-The training script and API are exercises to complete. Once implemented, run the training script with `python -m starter.train_model` and serve the API from the root with `uvicorn main:app`. Run the rubric helper from the root with `python sanitycheck.py tests` after writing API tests.
+Run commands from the repository root: the directory containing `requirements.txt`,
+`main.py`, `setup.py`, `starter/`, and the supplied `data/census.csv`. Local Git is
+optional. No GitHub/Azure account, remote push, DVC, cloud storage, hosted CI/CD,
+public endpoint, or external runtime service is required. Package installation
+requires network access; Udacity access and submission are still necessary.
 
-# Environment Set up
-* **Option 1: Using pip and venv (Recommended)**
-    * Ensure you have Python 3.13 installed
-    * Create virtual environment: `python3.13 -m venv .venv`
-    * Activate environment: `source .venv/bin/activate` (On Windows: `.venv\Scripts\activate`)
-    * From the repository root, install dependencies: `pip install -r requirements.txt`
-    * Install the local package: `pip install -e .`
+## 1. Set up Python
 
-* **Option 2: Using conda**
-    * Download and install conda if you don't have it already.
-    * conda create -n [envname] "python=3.13" scikit-learn pandas numpy pytest jupyter jupyterlab fastapi uvicorn pydantic httpx matplotlib seaborn -c conda-forge
-    * Install git either through conda ("conda install git") or through your CLI, e.g. sudo apt-get git.
-    * From the repository root, install the local package: `pip install -e .`
+Use Python 3.12. Create and activate a virtual environment:
 
-## Repositories
-* Create a directory for the project and initialize git.
-    * As you work on the code, continually commit changes. Trained models you want to use in production must be committed to GitHub.
-* Connect your local git repo to GitHub.
-* Setup GitHub Actions on your repo. You can use one of the pre-made GitHub Actions if at a minimum it runs pytest and flake8 on push and requires both to pass without error.
-    * Make sure you set up the GitHub Action to use Python 3.13 (same version as development).
-    * Note: Add flake8 to requirements.txt if you want to use it for linting: `pip install flake8`
+```sh
+python3.12 -m venv .venv
+. .venv/bin/activate
+python -m pip install -r requirements.txt
+python -m pip install -e .
+python -m pip check
+```
 
-# Data
-* Use `data/census.csv` and commit it to dvc.
-* This data is messy, try to open it in pandas and see what you get.
-* To clean it, use your favorite text editor to remove all spaces.
+See [dependency notes](PYTHON_3_13_UPDATES.md) for versions and purposes. The
+requirements were smoke-tested on Linux with Python 3.12.3; actual Workspace
+provisioning and completed-project validation must still be verified.
 
-# Model
-* Using the starter code, write a machine learning model that trains on the clean data and saves the model. Complete any function that has been started.
-* Include the final trained model and all fitted preprocessing artifacts needed for inference (such as the encoder and label binarizer) in the submitted repository/files, whether saved as `.pkl`, `.joblib`, or another format. Verify that a fresh clone or extracted submission can load them and run inference without retraining.
-* If a required artifact is ignored, add only that file with `git add -f path/to/artifact.pkl` (using its actual path). Review the staged files before committing and pushing.
-* Write unit tests for at least 3 functions in the model code.
-* Write a function that outputs the performance of the model on slices of the data.
-    * Suggestion: for simplicity, the function can just output the performance on slices of just the categorical features.
-* Write a model card using the provided template.
+## 2. Inspect and clean the supplied data
 
-# API Creation
-*  Create a RESTful API using FastAPI this must implement:
-    * GET on the root giving a welcome message.
-    * POST that does model inference.
-    * Type hinting must be used.
-    * Use a Pydantic model to ingest the body from POST. This model should contain an example.
-   	 * Hint: the data has names with hyphens and Python does not allow those as variable names. Do not modify the column names in the csv and instead use the functionality of FastAPI/Pydantic/etc to deal with this.
-* Write 3 unit tests to test the API (one for the GET and two for POST, one that tests each prediction).
+Load `data/census.csv` with pandas. Remove surrounding whitespace from column
+names and string values, and decide how to handle missing-value markers such as
+`?`. Preserve meaningful internal characters, original column names (including
+`fnlgt` and hyphenated names), and the target `salary`. Do not remove every space
+from the raw file indiscriminately. Keep the supplied CSV in the submission and
+apply reproducible cleaning in code so an extracted project can use it.
 
-# API Deployment
-* Create a free Heroku account (for the next steps you can either use the web GUI or download the Heroku CLI).
-* Create a new app and have it deployed from your GitHub repository.
-    * Use the repository root as the deployment root; it contains `requirements.txt` and `main.py`.
-    * Enable automatic deployments that only deploy if your continuous integration passes.
-    * Hint: think about how paths will differ in your local environment vs. on Heroku.
-    * Hint: development in Python is fast! But how fast you can iterate slows down if you rely on your CI/CD to fail before fixing an issue. I like to run flake8 locally before I commit changes.
-    * Note: Install flake8 separately if needed: `pip install flake8`
-* Write a script that uses the requests module to do one POST on your live API.
+## 3. Train, evaluate, and save inference artifacts
+
+Complete `starter/train_model.py` and the unfinished functions in
+`starter/ml/model.py`. Import preprocessing with
+`from starter.ml.data import process_data`. Split the cleaned data into training
+and held-out test sets before fitting preprocessing or the classifier. Fit the
+encoder and label binarizer only on training data; reuse those fitted objects
+for the test set and inference. Use a reproducible split.
+
+Evaluate precision, recall, and F1 on the held-out set. Compute the same metrics
+for categorical slices and save readable results, including each slice's sample
+count, to root-level `slice_output.txt`. Explain empty or unsupported slices.
+
+Use Python's `pickle` module to save the trained classifier and fitted objects
+at these exact paths, creating `model/` when needed:
+
+- `model/model.pkl`: trained classifier.
+- `model/encoder.pkl`: fitted categorical encoder.
+- `model/lb.pkl`: fitted label binarizer.
+
+If your model requires additional fitted preprocessing, include it inside the
+serialized classifier/pipeline or encoder artifact so these three files contain
+all inference state. Preserve feature order and cleaning behavior between
+training and serving. Load only your own trusted pickle artifacts.
+
+Run training from the root after completing the implementation:
+
+```sh
+python -m starter.train_model
+```
+
+Copy `model_card_template.md` to `model_card.md` and complete it with the data,
+model, held-out metrics, slice findings, intended use, and limitations. Record
+any cleaning and feature choices needed to reproduce the model.
+
+## 4. Implement the API and tests
+
+Implement `app` in `main.py`. Load the saved artifacts without retraining on
+startup or requests. Resolve artifact paths relative to the project files.
+
+- `GET /`: HTTP 200 with a JSON welcome message; document its exact body.
+- `POST /`: accept one record's features, excluding `salary`, and return HTTP
+  200 with `{"prediction": "<=50K"}` or `{"prediction": ">50K"}`. Decode the
+  predicted label using the fitted binarizer. Document the feature schema.
+- Use typed Pydantic request fields and aliases for hyphenated Census names.
+  Include a valid request example in the generated OpenAPI JSON.
+
+Write at least three ML-function tests and three API tests under `tests/`, named
+`test_*.py`. API tests must check the GET status and body and successful POST
+status and prediction for both classes. Choose two inputs whose opposite
+predictions you have confirmed with your fitted model; arbitrary fixed records
+are not guaranteed to produce particular classes. Use FastAPI's TestClient.
+Test preprocessing reuse, model behavior, and metrics with meaningful assertions.
+Do not retrain the project model merely to load it for API tests.
+
+## 5. Run local validation
+
+```sh
+python scripts/validate.py
+```
+
+This runs `python -m pytest tests/` followed by
+`python -m flake8 main.py starter/ tests/ scripts/ inference_client.py` and writes
+both outputs and exit statuses to `evidence/validation.txt`. Complete the HTTP
+client in the next section before the final validation run. Both checks must
+pass; incomplete starter files are expected to fail. The old `sanitycheck.py`
+helper is not the validation or submission gate for this workflow.
+
+## 6. Exercise the running server over real HTTP
+
+Start the server in one activated terminal at the project root:
+
+```sh
+python -m uvicorn main:app --host 127.0.0.1 --port 8000
+```
+
+Implement root-level `inference_client.py` with `requests`. It must use finite
+request timeouts, print the URL, status, and response body, and exit nonzero on
+connection errors or failed assertions. Against `http://127.0.0.1:8000`, it must:
+
+1. Call `GET /` and assert HTTP 200 and the documented welcome body.
+2. Call `POST /` with each of the two model-confirmed inputs, asserting HTTP 200
+   and the expected opposite prediction labels. Print both request bodies.
+3. Fetch `/openapi.json`, assert HTTP 200 and the presence of your request
+   example(s), and save the JSON to `evidence/openapi.json`.
+
+In a second activated terminal, run:
+
+```sh
+mkdir -p evidence
+python inference_client.py > evidence/http.txt 2>&1
+cat evidence/http.txt
+python scripts/validate.py
+```
+
+Check the client command's exit status before running another command. Preserve
+successful text evidence only after resolving failures. TestClient tests alone
+do not establish real HTTP operation. OpenAPI JSON provides request-example
+evidence without requiring Swagger UI, screenshots, or a CDN. Stop Uvicorn with
+Ctrl-C when finished.
+
+## 7. Package and verify the submission
+
+Review source, documentation, and evidence for credentials or personal secrets
+before packaging. Do not embed secrets in allowed files. Run:
+
+```sh
+python scripts/package_submission.py
+python -m zipfile -l submission.zip
+```
+
+The packager requires the following exact root-relative files, and includes only
+these plus non-hidden `.py` files recursively under `starter/` and `tests/`:
+
+- `README.md`, `requirements.txt`, `setup.py`, `PYTHON_3_13_UPDATES.md`.
+- `main.py`, `inference_client.py`, `starter/__init__.py`,
+  `starter/train_model.py`, `starter/ml/__init__.py`, `starter/ml/data.py`,
+  `starter/ml/model.py`, and at least one `tests/test_*.py` (possibly nested).
+- `scripts/validate.py`, `scripts/package_submission.py`.
+- `data/census.csv`.
+- `model/model.pkl`, `model/encoder.pkl`, `model/lb.pkl`.
+- `model_card.md`, `slice_output.txt`.
+- `evidence/validation.txt`, `evidence/http.txt`, `evidence/openapi.json`.
+
+Keep project Python helpers in `starter/`; the archive does not include arbitrary
+root scripts, auxiliary data, or extra model files. Missing or empty required
+files fail packaging (empty `__init__.py` markers are allowed). Symlinks in
+selected paths or visible source trees are rejected. Environments, `.git`,
+caches, hidden files, `.env`, credentials files, screenshots, prior archives,
+and unrelated files outside the allowlist are excluded. Review the printed file
+list; the packager cannot detect secrets embedded in source or evidence, nor
+verify that learner results are correct. It refuses to overwrite an existing
+`submission.zip`; move that archive aside before generating a replacement.
+
+Extract into a new empty directory (choose a new path for each attempt):
+
+```sh
+python -m zipfile -e submission.zip /tmp/census-submission-check
+cd /tmp/census-submission-check
+python3.12 -m venv .venv
+. .venv/bin/activate
+python -m pip install -r requirements.txt
+python -m pip install -e .
+python -m pip check
+python scripts/validate.py
+```
+
+Without running training, start Uvicorn and run the HTTP client again as in
+section 6. Confirm that the extracted artifacts produce both expected classes
+and the same API behavior. This verifies that no original working-directory
+files or external runtime services are needed. If changes are needed, fix the
+original project, regenerate evidence and ZIP, and repeat extraction.
+
+Submit the self-contained `submission.zip` through the Udacity submission flow.
+No repository URL, Git metadata, reviewer invitation, CI/CD screenshot, or
+public URL is part of this project's submission contract.

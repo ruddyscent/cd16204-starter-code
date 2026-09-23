@@ -111,7 +111,7 @@ dmypy.json
 # Machine Learning / Data Science specific
 # Models
 # Generated models stay ignored by default. Add only the final model and
-# fitted preprocessing artifacts required for inference (see README # Model).
+# fitted preprocessing artifacts required for inference (see README section 3).
 *.pkl
 *.joblib
 *.h5
@@ -189,3 +189,5 @@ screenshots/*.jpeg
 *.pem
 secrets.json
 config.ini
+# Generated local submission archive
+submission.zip
