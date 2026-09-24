@@ -151,6 +151,9 @@ Ctrl-C when finished.
 
 ## 7. Package and verify the submission
 
+Create and verify the ZIP as a reproducibility check for every submission route.
+Submitting directly from the Workspace does not require uploading this ZIP.
+
 Review source, documentation, and evidence for credentials or personal secrets
 before packaging. Do not embed secrets in allowed files. Run:
 
@@ -201,6 +204,23 @@ and the same API behavior. This verifies that no original working-directory
 files or external runtime services are needed. If changes are needed, fix the
 original project, regenerate evidence and ZIP, and repeat extraction.
 
-Submit the self-contained `submission.zip` through the Udacity submission flow.
-No repository URL, Git metadata, reviewer invitation, CI/CD screenshot, or
-public URL is part of this project's submission contract.
+## 8. Submit your project
+
+**Recommended: submit directly from the Workspace.** Save all required project
+files under `/workspace/cd16204-starter-code/`, then use **Submit Project** in the
+Workspace. Keep the source, data, model artifacts, tests, documentation, and
+evidence available as project files, not only inside `submission.zip`. This route
+requires no external account, repository URL, Git metadata, reviewer invitation,
+or manual ZIP upload.
+
+You can also choose either of these optional alternatives on **Project
+Submission**:
+
+- **Upload zip file:** upload the self-contained `submission.zip` after verifying
+  the extracted copy as described above.
+- **Select GitHub repo:** select a repository containing the same required
+  project files and evidence. Only this optional route requires a GitHub account.
+
+All routes use the same rubric, required files, and validation evidence. Hosted
+CI/CD, CI/CD screenshots, cloud deployment, and a public API endpoint are not
+required. Keep an external backup before leaving or resetting the Workspace.
